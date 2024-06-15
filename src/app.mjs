@@ -8,6 +8,8 @@ import session from "express-session";
 import MongoStore from "connect-mongo";
 import router from "./routes/index.mjs";
 import { mongoUri } from "./config/mongoDb.config.mjs";
+import passport from "passport";
+import initializePassport from "./config/passport.config.mjs";
 
 // Conexión con la base de datos
 initializeMongoDb();
@@ -51,6 +53,9 @@ app.use(
     },
   }),
 );
+initializePassport();
+app.use(passport.initialize());
+app.use(passport.session());
 
 // Usamos las rutas
 app.use("/api", router);

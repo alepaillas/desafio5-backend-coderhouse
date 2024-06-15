@@ -1,92 +1,76 @@
 import { Router } from "express";
-import userDao from "../dao/mongoDao/user.dao.mjs";
-import { createHash, isValidPassword } from "../utils/bcrypt.mjs";
+import passport from "passport";
 
 const router = Router();
 
-router.post("/register", async (req, res) => {
-  try {
-    const userData = req.body;
-
-    // validamos que tengamos todos los datos de registro
-    // nuestro form en el front valida estos datos
-    // pero si los obtenemos sin el front necesitamos seguridad
-    // de que no guardaremos basura en la BBDD
-
-    // user model
-    /* 
-    first_name: String,
-    last_name: String,
-    email: String,
-    password: String,
-    age: Number,
-    */
-
-    const { first_name, last_name, email, age, password } = userData;
-    if (!first_name || !last_name || !email || !password || !age) {
+router.post("/register", (req, res, next) => {
+  passport.authenticate("register", (err, user, info) => {
+    try {
+      if (err) {
+        console.error("Error during registration:", err);
+        return res
+          .status(500)
+          .json({ status: "error", msg: "Internal server error." });
+      }
+      if (!user) {
+        return res
+          .status(400)
+          .json({
+            status: "error",
+            msg: info.message || "Invalid registration details",
+          });
+      }
+      // Successful registration
+      res.status(201).json({ status: "success", msg: "User registered." });
+    } catch (error) {
+      console.error("Unexpected error during registration:", error);
       return res
-        .status(400)
-        .send({ status: "Error", msg: "Faltan datos de registro." });
+        .status(500)
+        .json({ status: "error", msg: "Internal server error." });
     }
-
-    // hasheamos el password para no guardarlo en plain text en la BBDD
-    userData.password = createHash(password);
-    //console.log(userData);
-
-    const newUser = await userDao.create(userData);
-    if (!newUser) {
-      return res
-        .status(404)
-        .json({ status: "Error", msg: "No se ha podido crear el usuario." });
-    }
-
-    res.status(201).json({ status: "success", payload: newUser });
-  } catch (error) {
-    console.error(error);
-    res.status(500).json({ status: "Error", msg: "Internal server error." });
-  }
+  })(req, res, next);
 });
 
-router.post("/login", async (req, res) => {
-  try {
-    const { email, password } = req.body;
-    if (!email || !password) {
+router.post("/login", (req, res, next) => {
+  passport.authenticate("login", (err, user, info) => {
+    try {
+      if (err) {
+        console.error("Error during login:", err);
+        return res
+          .status(500)
+          .json({ status: "Error", msg: "Internal server error." });
+      }
+      if (!user) {
+        return res.status(400).json({
+          status: "Error",
+          msg: info.message || "Invalid credentials",
+        });
+      }
+      req.login(user, (loginErr) => {
+        if (loginErr) {
+          console.error("Error during login session:", loginErr);
+          return res
+            .status(500)
+            .json({ status: "Error", msg: "Internal server error." });
+        }
+        // Customize session object if needed
+        req.session.user = {
+          first_name: user.first_name,
+          last_name: user.last_name,
+          age: user.age,
+          email: user.email,
+        };
+        return res
+          .status(200)
+          .json({ status: "success", payload: req.session.user });
+      });
+    } catch (error) {
+      console.error("Unexpected error during login:", error);
       return res
-        .status(400)
-        .send({ status: "Error", msg: "Falta ingresar password o email." });
+        .status(500)
+        .json({ status: "Error", msg: "Internal server error." });
     }
-
-    if (email === "adminCoder@coder.com" && password === "adminCod3r123") {
-      req.session.user = {
-        email,
-        role: "admin",
-      };
-
-      return res
-        .status(200)
-        .json({ status: "success", payload: req.session.user });
-    }
-
-    const user = await userDao.getByEmail(email);
-    // validamos si existe el usuario y el password es correcto
-    if (!user || !isValidPassword(user, password)) {
-      return res
-        .status(401)
-        .send({ status: "Error", msg: "Invalid user or password." });
-    } else {
-      req.session.user = {
-        email,
-        role: "user",
-      };
-    }
-
-    return res
-      .status(200)
-      .json({ status: "success", payload: req.session.user });
-  } catch (error) {
-    console.error(error);
-    res.status(500).json({ status: "Error", msg: "Internal server error." });
-  }
+  })(req, res, next);
 });
 
 router.get("/logout", async (req, res) => {

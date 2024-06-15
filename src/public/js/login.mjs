@@ -21,15 +21,13 @@ formularioLogin.addEventListener("submit", async (event) => {
     });
 
     if (response.ok) {
-      console.log("Inicio de sesión exitoso");
-      window.location.href = "/"; // Replace with the URL of the main page
+      window.location.href = "/"; // Redirect to the main page on successful login
     } else {
-      throw new Error(
-        `Error de inicio de sesión: ${errorData.msg || "Ocurrió un error"}`,
-      );
+      const errorResponse = await response.json(); // Parse the JSON error response
+      throw new Error(`Error de inicio de sesión: ${errorResponse.msg}`);
     }
   } catch (error) {
-    console.error("Error al iniciar sesión:", error);
+    //console.error("Error al iniciar sesión:", error);
     alert(error.message); // Display the more informative error message
   }
 });
