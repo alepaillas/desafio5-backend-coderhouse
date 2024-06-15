@@ -13,12 +13,10 @@ router.post("/register", (req, res, next) => {
           .json({ status: "error", msg: "Internal server error." });
       }
       if (!user) {
-        return res
-          .status(400)
-          .json({
-            status: "error",
-            msg: info.message || "Invalid registration details",
-          });
+        return res.status(400).json({
+          status: "error",
+          msg: info.message || "Invalid registration details",
+        });
       }
       // Successful registration
       res.status(201).json({ status: "success", msg: "User registered." });
@@ -72,6 +70,24 @@ router.post("/login", (req, res, next) => {
     }
   })(req, res, next);
 });
+
+router.get(
+  "/github",
+  passport.authenticate("github", async (req, res) => {}),
+);
+
+router.get(
+  "/githubCallback",
+  passport.authenticate("github", { failureRedirect: "/login" }),
+  (req, res) => {
+    if (req.user) {
+      req.session.user = req.user; // Asegúrate de que req.user esté definido
+      res.redirect("/");
+    } else {
+      res.redirect("/login");
+    }
+  },
+);
 
 router.get("/logout", async (req, res) => {
   try {

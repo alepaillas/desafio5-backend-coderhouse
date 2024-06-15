@@ -10,6 +10,7 @@ import router from "./routes/index.mjs";
 import { mongoUri } from "./config/mongoDb.config.mjs";
 import passport from "passport";
 import initializePassport from "./config/passport.config.mjs";
+import cors from "cors";
 
 // Conexión con la base de datos
 initializeMongoDb();
@@ -28,6 +29,10 @@ process.on("SIGTERM", async () => {
 const app = express();
 // Definimos el puerto en el que se ejecutará el servidor, utilizando el puerto definido en las variables de entorno si está disponible, de lo contrario, utilizamos el puerto 8080 por defecto
 const PORT = process.env.PORT || 8080;
+
+// Middleware para habilitar CORS
+// Necesario para auth con GitHub
+app.use(cors());
 
 // Para parsear JSON entrante por req.body
 app.use(express.json());
