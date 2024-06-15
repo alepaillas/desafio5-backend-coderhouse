@@ -1,0 +1,42 @@
+{
+  "name": "desafio4-backend-paillas",
+  "version": "1.0.0",
+  "description": "Implementación de login.",
+  "main": "/src/app.mjs",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node ./src/app.mjs",
+    "dev": "concurrently \"nodemon ./src/app.mjs\" \"tailwindcss -i ./src/public/css/input.css -o ./src/public/css/output.css --watch\""
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/alepaillas/desafio4-backend-paillas"
+  },
+  "keywords": [
+    "ecommerce"
+  ],
+  "author": "Alejandra Paillas",
+  "license": "GPL-3.0",
+  "bugs": {
+    "url": "https://github.com/alepaillas/desafio4-backend-paillas/issues"
+  },
+  "homepage": "https://github.com/alepaillas/desafio4-backend-paillas#readme",
+  "dependencies": {
+    "connect-mongo": "^5.1.0",
+    "cookie-parser": "^1.4.6",
+    "express": "^4.19.2",
+    "express-handlebars": "^7.1.2",
+    "express-session": "^1.18.0",
+    "mongoose": "^8.4.0",
+    "mongoose-paginate-v2": "^1.8.1",
+    "session-file-store": "^1.5.0"
+  },
+  "devDependencies": {
+    "@tailwindcss/aspect-ratio": "^0.4.2",
+    "@tailwindcss/forms": "^0.5.7",
+    "concurrently": "^8.2.2",
+    "nodemon": "^3.1.0",
+    "prettier-plugin-tailwindcss": "^0.6.2",
+    "tailwindcss": "^3.4.4"
+  }
+}
