@@ -3,18 +3,18 @@ const formularioRegistro = document.getElementById("formulario-registro");
 formularioRegistro.addEventListener("submit", (event) => {
   event.preventDefault();
 
-  const nombre = document.getElementById("nombre").value;
-  const apellido = document.getElementById("apellido").value; // Assuming you have a last name field
+  const first_name = document.getElementById("first_name").value;
+  const last_name = document.getElementById("last_name").value; // Assuming you have a last name field
   const email = document.getElementById("email").value;
   const password = document.getElementById("password").value;
-  const edad = document.getElementById("edad").value; // Assuming you have an age field
+  const age = document.getElementById("age").value; // Assuming you have an age field
 
   const datos = {
-    nombre,
-    apellido,
+    first_name,
+    last_name,
     email,
     password,
-    edad,
+    age,
   };
 
   fetch("/api/session/register", {
